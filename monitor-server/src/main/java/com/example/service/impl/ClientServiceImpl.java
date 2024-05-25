@@ -2,9 +2,14 @@ package com.example.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.Client;
+import com.example.entity.dto.ClientDetail;
+import com.example.entity.vo.request.ClientDetailVO;
+import com.example.mapper.ClientDetailMapper;
 import com.example.mapper.ClientMapper;
 import com.example.service.ClientService;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -18,6 +23,9 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     private final Map<Integer, Client> clientIdCache = new ConcurrentHashMap<>();
     private final Map<String, Client> clientTokenCache = new ConcurrentHashMap<>();
+
+    @Resource
+    ClientDetailMapper clientDetailMapper;
 
     @PostConstruct
     public void initClientCache() {
@@ -53,6 +61,18 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
             }
         }
         return false;
+    }
+
+    @Override
+    public void updateClientDetail(ClientDetailVO vo, Client client) {
+        ClientDetail detail = new ClientDetail();
+        BeanUtils.copyProperties(vo, detail);
+        detail.setId(client.getId());
+        if (Objects.nonNull(clientDetailMapper.selectById(client.getId()))) {
+            clientDetailMapper.updateById(detail);
+        } else {
+            clientDetailMapper.insert(detail);
+        }
     }
 
     private void addClientCache(Client client) {

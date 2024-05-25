@@ -7,6 +7,8 @@ import org.example.client.MonitorClientApplication;
 import org.example.client.entity.ConnectionConfig;
 import org.example.client.utils.MonitorUtils;
 import org.example.client.utils.NetUtils;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,7 +21,7 @@ import java.util.Scanner;
 
 @Configuration
 @Slf4j
-public class ServerConfiguration {
+public class ServerConfiguration implements ApplicationRunner {
 
     @Resource
     NetUtils net;
@@ -35,6 +37,12 @@ public class ServerConfiguration {
             config = this.registerToServer();
         System.out.println(monitorUtils.monitorBaseDetail());
         return config;
+    }
+
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        log.info("正在向服务端更新系统信息...");
+        net.updateBseDetails(monitorUtils.monitorBaseDetail());
     }
 
     private ConnectionConfig registerToServer() {
