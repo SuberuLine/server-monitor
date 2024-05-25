@@ -111,7 +111,7 @@ public class MonitorUtils {
                 String[] ipv4Addr = networkIF.getIPv4addr();
                 NetworkInterface ni = networkIF.queryNetworkInterface();
                 if (!ni.isLoopback() && !ni.isPointToPoint() && ni.isUp() && !ni.isVirtual()
-                        && (ni.getName().startsWith("eth0") || ni.getName().startsWith("en0"))
+                        && (ni.getName().startsWith("eth") || ni.getName().startsWith("en"))
                         && ipv4Addr.length > 0) {
                     return networkIF;
                 }

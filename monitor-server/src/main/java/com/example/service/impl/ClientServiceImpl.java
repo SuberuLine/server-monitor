@@ -8,6 +8,7 @@ import com.example.entity.vo.request.RuntimeDetailVO;
 import com.example.mapper.ClientDetailMapper;
 import com.example.mapper.ClientMapper;
 import com.example.service.ClientService;
+import com.example.utils.InfluxDbUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,9 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     @Resource
     ClientDetailMapper clientDetailMapper;
+
+    @Resource
+    InfluxDbUtils influx;
 
     @PostConstruct
     public void initClientCache() {
@@ -81,9 +85,11 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     @Override
     public void updateRuntimeDetail(RuntimeDetailVO vo, Client client) {
         currentRuntime.put(client.getId(), vo);
+        System.out.println(vo);
+        influx.writeRuntimeData(client.getId(), vo);
     }
 
-    private Map<Integer, RuntimeDetailVO> currentRuntime = new ConcurrentHashMap<>();
+    private final Map<Integer, RuntimeDetailVO> currentRuntime = new ConcurrentHashMap<>();
 
     private void addClientCache(Client client) {
         clientIdCache.put(client.getId(), client);
