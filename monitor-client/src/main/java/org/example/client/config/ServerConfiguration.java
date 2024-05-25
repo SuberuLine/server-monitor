@@ -3,7 +3,9 @@ package org.example.client.config;
 import com.alibaba.fastjson2.JSONObject;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.example.client.MonitorClientApplication;
 import org.example.client.entity.ConnectionConfig;
+import org.example.client.utils.MonitorUtils;
 import org.example.client.utils.NetUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,12 +24,16 @@ public class ServerConfiguration {
     @Resource
     NetUtils net;
 
+    @Resource
+    MonitorUtils monitorUtils;
+
     @Bean
-    ConnectionConfig connectionConfig() {
+    ConnectionConfig connectionConfig(MonitorClientApplication monitorClientApplication) {
         log.info("正在加载服务连接配置");
         ConnectionConfig config = this.readConfigurationFromFile();
         if (config == null)
             config = this.registerToServer();
+        System.out.println(monitorUtils.monitorBaseDetail());
         return config;
     }
 
