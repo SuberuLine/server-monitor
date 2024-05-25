@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.client.entity.BaseDetail;
 import org.example.client.entity.ConnectionConfig;
 import org.example.client.entity.Response;
+import org.example.client.entity.RuntimeDetail;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -53,12 +54,19 @@ public class NetUtils {
         }
     }
 
-    public void updateBseDetails(BaseDetail detail) {
+    public void updateBaseDetails(BaseDetail detail) {
         Response response = this.doPost("/detail", detail);
         if (response.success()) {
             log.info("系统基本信息已更新完成");
         } else {
             log.error("系统基本信息更新失败: {}", response.message());
+        }
+    }
+
+    public void updateRuntimeDetails(RuntimeDetail detail) {
+        Response response = this.doPost("/runtime", detail);
+        if (!response.success()) {
+            log.warn("进行状态更新时出现异常:{}", response.message());
         }
     }
 
