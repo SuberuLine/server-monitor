@@ -1,7 +1,13 @@
 <script setup>
-import {defineComponent} from "vue";
+import {defineComponent, ref} from "vue";
+import {get}from "@/net"
 import PreviewCard from "@/component/PreviewCard.vue";
 
+const list = ref([])
+
+const updateList = () => get(`/api/monitor/list`, data => list.value = data)
+setInterval(updateList, 10000)
+updateList()
 defineComponent({
   name: 'Manage'
 })
@@ -18,9 +24,7 @@ defineComponent({
     </div>
     <el-divider style="margin: 10px 0"/>
     <div class="card-list">
-      <preview-card />
-      <preview-card />
-      <preview-card />
+      <preview-card v-for="item in list" :data="item"/>
     </div>
   </div>
 </template>

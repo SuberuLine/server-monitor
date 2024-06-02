@@ -5,6 +5,7 @@ import com.example.entity.dto.Client;
 import com.example.entity.dto.ClientDetail;
 import com.example.entity.vo.request.ClientDetailVO;
 import com.example.entity.vo.request.RuntimeDetailVO;
+import com.example.entity.vo.response.ClientPreviewVO;
 import com.example.mapper.ClientDetailMapper;
 import com.example.mapper.ClientMapper;
 import com.example.service.ClientService;
@@ -87,6 +88,20 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         currentRuntime.put(client.getId(), vo);
         System.out.println(vo);
         influx.writeRuntimeData(client.getId(), vo);
+    }
+
+    @Override
+    public List<ClientPreviewVO> listClients() {
+        return clientIdCache.values().stream().map(client -> {
+            ClientPreviewVO vo = client.asViewObject(ClientPreviewVO.class);
+            BeanUtils.copyProperties(clientDetailMapper.selectById(vo.getId()), vo);
+            RuntimeDetailVO runtime = currentRuntime.get(client.getId());
+            if (runtime != null && System.currentTimeMillis() - runtime.getTimestamp() < 60 * 1000) {
+                BeanUtils.copyProperties(runtime, vo);
+                vo.setOnline(true);
+            }
+            return vo;
+        }).toList();
     }
 
     private final Map<Integer, RuntimeDetailVO> currentRuntime = new ConcurrentHashMap<>();
