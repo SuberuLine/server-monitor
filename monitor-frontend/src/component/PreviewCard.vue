@@ -1,9 +1,20 @@
 <script setup>
-import {fitByUnit} from "@/tools";
+import {fitByUnit, rename} from "@/tools";
+import {useClipboard} from "@vueuse/core";
+import {ElMessage} from "element-plus";
 
 const props = defineProps({
-  data: Object
+  data: Object,
+  update: Function
 })
+
+const {copy} = useClipboard();
+const copyIp = () => {
+  copy(props.data.ip).then(() => {
+    ElMessage.success("成功拷贝IP地址到剪切板！")
+  })
+}
+
 </script>
 
 <template>
@@ -13,7 +24,7 @@ const props = defineProps({
         <div class="name">
           <span :class="`flag-icon flag-icon-${data.location}`"></span>
           <span style="margin: 0 5px">{{data.name}}</span>
-          <i style="margin: 0 5px" class="fa-solid fa-pen-to-square"></i>
+          <i style="margin: 0 5px" class="fa-solid fa-pen-to-square interact-item" @click.stop="rename(data.id, data.name, update)" />
         </div>
         <div class="os">
           操作系统：{{`${data.osName} ${data.osVersion}`}}
@@ -31,7 +42,7 @@ const props = defineProps({
     <el-divider style="margin: 10px 0" />
     <div class="network">
       <span style="margin-right: 10px">公网IP：{{data.ip}}</span>
-      <i class="fa-solid fa-copy" style="color: dodgerblue"></i>
+      <i class="fa-solid fa-copy interact-item" style="color: dodgerblue" @click.stop="copyIp"></i>
     </div>
     <div class="cpu">
       <span style="margin-right: 10px">处理器： {{data.cpuName}}</span>
@@ -75,6 +86,16 @@ const props = defineProps({
 }
 
 .dark .instance-card {color: #d9d9d9}
+
+.interact-item {
+  transition: .3s;
+
+  &:hover {
+    cursor: pointer;
+    scale: 1.1;
+    opacity: 0.8;
+  }
+}
 
 .instance-card {
   width: 320px;
