@@ -136,6 +136,14 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     }
 
     @Override
+    public void deleteClient(int clientId) {
+        this.removeById(clientId);
+        clientDetailMapper.deleteById(clientId);
+        this.initClientCache();
+        currentRuntime.remove(clientId);
+    }
+
+    @Override
     public ClientDetailsVO clientDetails(int clientId) {
         ClientDetailsVO vo = this.clientIdCache.get(clientId).asViewObject(ClientDetailsVO.class);
         BeanUtils.copyProperties(clientDetailMapper.selectById(clientId), vo);

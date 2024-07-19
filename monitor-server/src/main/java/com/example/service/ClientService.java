@@ -25,4 +25,5 @@ public interface ClientService extends IService<Client> {
     RuntimeHistoryVO clientRuntimeDetailsHistory(int clientId);
     RuntimeDetailVO clientRuntimeDetailsNow(int clientId);
     void renameNode(RenameNodeVO vo);
+    void deleteClient(int clientId);
 }
