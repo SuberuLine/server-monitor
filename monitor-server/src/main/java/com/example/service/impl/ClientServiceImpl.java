@@ -91,7 +91,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     @Override
     public void updateRuntimeDetail(RuntimeDetailVO vo, Client client) {
         currentRuntime.put(client.getId(), vo);
-        System.out.println(vo);
+        log.debug(vo.toString());
         influx.writeRuntimeData(client.getId(), vo);
     }
 
@@ -208,7 +208,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         StringBuilder sb = new StringBuilder(24);
         for (int i = 0; i < 24; i++)
             sb.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
-        System.out.println(sb);
+        log.debug("已生成新的Token：{}", sb);
         return sb.toString();
     }
 }
