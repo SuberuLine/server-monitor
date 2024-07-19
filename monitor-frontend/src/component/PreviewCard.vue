@@ -1,5 +1,5 @@
 <script setup>
-import {fitByUnit, rename} from "@/tools";
+import {fitByUnit, rename, percentageToStatus} from "@/tools";
 import {useClipboard} from "@vueuse/core";
 import {ElMessage} from "element-plus";
 
@@ -56,11 +56,11 @@ const copyIp = () => {
       </div>
       <div class="progress">
         <span>CPU: {{(data.cpuUsage * 100).toFixed(1)}}%</span>
-        <el-progress :status="'success'" :percentage="data.cpuUsage * 100" :stroke-width="5" :show-text="false"/>
+        <el-progress :status="percentageToStatus(data.cpuUsage * 100)" :percentage="data.cpuUsage * 100" :stroke-width="5" :show-text="false"/>
       </div>
       <div class="progress">
         <span>MEM: <b>{{data.memoryUsage.toFixed(1)}}</b> GB</span>
-        <el-progress :status="'success'" :percentage="data.memoryUsage / data.memory * 100" :stroke-width="5" :show-text="false"/>
+        <el-progress :status="percentageToStatus(data.memoryUsage / data.memory * 100)" :percentage="data.memoryUsage / data.memory * 100" :stroke-width="5" :show-text="false"/>
       </div>
       <div class="network-flow">
         <div>网络流量</div>
@@ -77,14 +77,6 @@ const copyIp = () => {
 </template>
 
 <style scoped>
-:deep(.el-progress-bar__outer) {
-  background-color: #18cb1822;
-}
-
-:deep(.el-progress-bar__inner) {
-  background-color: #18cb18;
-}
-
 .dark .instance-card {color: #d9d9d9}
 
 .interact-item {
@@ -104,6 +96,11 @@ const copyIp = () => {
   border-radius: 5px;
   box-sizing: border-box;
   color: #6b6b6b;
+
+  &:hover {
+    cursor: pointer;
+    scale: 1.02;
+  }
 
   .name {
     font-size: 15px;
