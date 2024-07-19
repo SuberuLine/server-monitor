@@ -4,16 +4,12 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.Client;
 import com.example.entity.dto.ClientDetail;
-import com.example.entity.vo.request.ClientDetailVO;
-import com.example.entity.vo.request.RenameClientVO;
-import com.example.entity.vo.request.RenameNodeVO;
-import com.example.entity.vo.request.RuntimeDetailVO;
-import com.example.entity.vo.response.ClientDetailsVO;
-import com.example.entity.vo.response.ClientPreviewVO;
-import com.example.entity.vo.response.ClientSimpleVO;
-import com.example.entity.vo.response.RuntimeHistoryVO;
+import com.example.entity.dto.ClientSsh;
+import com.example.entity.vo.request.*;
+import com.example.entity.vo.response.*;
 import com.example.mapper.ClientDetailMapper;
 import com.example.mapper.ClientMapper;
+import com.example.mapper.ClientSshMapper;
 import com.example.service.ClientService;
 import com.example.utils.InfluxDbUtils;
 import jakarta.annotation.PostConstruct;
@@ -40,6 +36,9 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     @Resource
     InfluxDbUtils influx;
+
+    @Resource
+    ClientSshMapper sshMapper;
 
     @PostConstruct
     public void initClientCache() {
@@ -158,6 +157,33 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         ClientDetailsVO vo = this.clientIdCache.get(clientId).asViewObject(ClientDetailsVO.class);
         BeanUtils.copyProperties(clientDetailMapper.selectById(clientId), vo);
         vo.setOnline(this.isOnline(currentRuntime.get(clientId)));
+        return vo;
+    }
+
+    @Override
+    public void saveClientSshConnection(SshConnectionVO vo) {
+        Client client = clientIdCache.get(vo.getId());
+        if(client == null) return;
+        ClientSsh ssh = new ClientSsh();
+        BeanUtils.copyProperties(vo, ssh);
+        if(Objects.nonNull(sshMapper.selectById(client.getId()))) {
+            sshMapper.updateById(ssh);
+        } else {
+            sshMapper.insert(ssh);
+        }
+    }
+
+    @Override
+    public SshSettingsVO sshSettings(int clientId) {
+        ClientDetail detail = clientDetailMapper.selectById(clientId);
+        ClientSsh ssh = sshMapper.selectById(clientId);
+        SshSettingsVO vo;
+        if(ssh == null) {
+            vo = new SshSettingsVO();
+        } else {
+            vo = ssh.asViewObject(SshSettingsVO.class);
+        }
+        vo.setIp(detail.getIp());
         return vo;
     }
 
